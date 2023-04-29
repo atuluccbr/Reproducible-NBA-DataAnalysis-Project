@@ -1,0 +1,110 @@
+---
+title: "Reproducible Project"
+author: "Atul Katoch"
+date: "22 April 2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This section should provide relevant background information and justification for the project, including:
+
+Basketball is a popular team sport played worldwide, with two teams of five players each competing to score points by shooting a ball through a hoop elevated 10 feet above the ground. The game is played on a rectangular court with a hoop at each end, and the team with the most points at the end of the game is declared the winner.
+
+Some key metrics used in basketball include points scored, rebounds, assists, steals, and blocks. Points are scored when a player successfully shoots the ball through the hoop, with each shot counting for two or three points depending on where the shot was taken from on the court. Rebounds occur when a player grabs a missed shot or a ball that bounces off the backboard, with offensive rebounds giving the team another opportunity to score. Assists are awarded when a player passes the ball to a teammate who then scores, while steals and blocks refer to defensive actions that prevent the opposing team from scoring.
+
+There are five positions in basketball: 
+- point guard 
+- shooting guard 
+- small forward 
+- power forward and 
+- center. 
+Each position has specific requirements and responsibilities:
+
+**Point guard**: Generally the smallest player on the court, the point guard is responsible for bringing the ball up the court and initiating the team's offense. They must be quick and agile, with excellent ball-handling skills and the ability to make quick decisions under pressure.
+
+**Shooting guard**: Typically a taller player than the point guard, the shooting guard is often the team's best perimeter shooter and scorer. They must be able to create their own shot and move well without the ball to get open for shots.
+
+**Small forward**: A versatile player who can play inside or outside, the small forward is often tasked with guarding the opposing team's best player. They must be able to score from the perimeter and also drive to the basket, as well as rebound and defend.
+
+**Power forward**: Generally a strong, physical player who can play inside and outside, the power forward is responsible for scoring and rebounding in the post, as well as defending the opposing team's big men.
+
+**Center**: The tallest player on the court, the center is responsible for scoring and rebounding in the post, as well as protecting the rim on defense. They must be strong, physical, and able to defend against the opposing team's big men.
+
+Scenario of this project is to act as a data analyst with the Chicago Bulls competing in the NBA(National Basketball Association). Chicago Bulls are not doing very well recently in the NBA, they are placed 27th out of 30 based on the win-loss record.
+The budget allocated to the 2019-20 season is $118Million.
+
+The job given to the data analyst is to find the best five [starting players](https://en.wikipedia.org/wiki/Basketball_positions)Chicago Bulls can afford which can help to improve their ranking in the league and can challenge and aim to win the championship.
+
+I have been provided with the 2018-19 season data that include the nba player statistics, player salary, team payroll and team statistics as well.
+
+I strongly believe that data analysis will help in monitoring player performance, game strategy and above all the talent identification who is still within the budget range and can help the team to win the games. 
+
+This project is very important because data gathering, data analysis of the Athletes can provide valuable insights that can help teams optimize player performance and develop game strategies that give them a competitive edge.
+```{r load_libraries}
+library(tidyverse)
+library(dplyr)
+library(broom)
+library(ggplot2)
+
+```
+
+## Read the data using the 'read_csv' function
+
+
+
+```{r read_data}
+df1 <- read_csv("data/raw/2018-19_nba_team-statistics_1.csv")
+df2 <- read_csv("data/raw/2018-19_nba_team-statistics_2.csv")
+player_sal <- read_csv("data/raw/2018-19_nba_player-salaries.csv")
+player_stat <- read_csv("data/raw/2018-19_nba_player-statistics.csv")
+team_pyrl <- read_csv("data/raw/2019-20_nba_team-payroll.csv")
+
+```
+```{r}
+df1 <- select(df1, - Rk)
+```
+```{r}
+df2 <- select(df2, -c(Rk, G))
+```
+```{r}
+check <- player_stat %>% group_by(Pos)
+```
+
+
+
+##question to answer
+1. Do teams that take more offensive rebounds win more games?
+2. Do teams that take more defensive rebounds win more games?
+3. Do teams that score more 3 pointers win more games?
+4. Do teams that score more 2 pointers win more games?
+5. Do teams that steal more win more games?
+6. Do teams that have more assists win more games?
+7.
+
+######joining data
+```{r}
+
+
+combined_team_stat <- left_join(df1, df2, by = c("Team"))
+
+```
+###Check the header and tail of the dataset
+```{r}
+head(df)
+
+tail(df)
+```
+
+###check the structure of the dataset using the 'str' fuction
+```{r}
+str(player_stat)
+```
+
+
+```
+
