@@ -57,31 +57,70 @@ library(ggplot2)
 ```{r read_data}
 df1 <- read_csv("data/raw/2018-19_nba_team-statistics_1.csv")
 df2 <- read_csv("data/raw/2018-19_nba_team-statistics_2.csv")
-player_sal <- read_csv("data/raw/2018-19_nba_player-salaries.csv")
-player_stat <- read_csv("data/raw/2018-19_nba_player-statistics.csv")
+df3 <- read_csv("data/raw/2018-19_nba_player-statistics.csv")
+df4 <- read_csv("data/raw/2018-19_nba_player-salaries.csv")
 team_pyrl <- read_csv("data/raw/2019-20_nba_team-payroll.csv")
 
 ```
+###remove the last 3 columns of df1 as they looks like empty columns.
+
 ```{r}
 df1 <- select(df1, - Rk)
 ```
+###Every team played 82 games, the G column can be deleted.
+###Ranking column Rk can be deleted as well
 ```{r}
 df2 <- select(df2, -c(Rk, G))
 ```
+###In df3 dataframe player stats are listed. There is duplicate rows issue here.
+###We need to first fix the duplicate rows for the players who were 
+###traded during the season.
+###These players have the row with 'TOT' in team column. This row is their total.
+###I am deleting rows with TOT in team and then add duplicate rows.
 ```{r}
-check <- player_stat %>% group_by(Pos)
+df3 <- df3[!df3$Tm == 'TOT',]
 ```
+###fixing the position variable (Pos)
+```{r}
+df3$Pos[df3$Pos == "PG"] <- "1"
+df3$Pos[df3$Pos == "SG"] <- "2"
+df3$Pos[df3$Pos == "SG-PF"] <- "2"
+df3$Pos[df3$Pos == "SG-SF"] <- "2"
+df3$Pos[df3$Pos == "SF"] <- "3"
+df3$Pos[df3$Pos == "SF-SG"] <- "3"
+df3$Pos[df3$Pos == "PF"] <- "4" 
+df3$Pos[df3$Pos == "PF-C"] <- "4"
+df3$Pos[df3$Pos == "PF-SF"] <- "4"
+df3$Pos[df3$Pos == "C"] <- "5" 
+df3$Pos[df3$Pos == "C-PF"] <- "5"
 
+```
+```{r}
+df3 <-select(df3, -c(Tm))
+```
+###add all numbers of duplicate rows and show a one unique row.
+###remeber we have already deleted the rows where Tm == TOT
 
-
-##question to answer
+###question to answer
 1. Do teams that take more offensive rebounds win more games?
 2. Do teams that take more defensive rebounds win more games?
 3. Do teams that score more 3 pointers win more games?
 4. Do teams that score more 2 pointers win more games?
 5. Do teams that steal more win more games?
 6. Do teams that have more assists win more games?
-7.
+7. check the multicollinerarity
+```{r}
+df3<- df3 %>%
+  group_by(player_name, Pos) %>%
+  summarise(across(everything(), sum))
+```
+### check if the function to sum all variables for duplicate rows working fine
+### I checked the data and Ryan Anderson total sum of 3PA is 40
+```{r}
+my_chk <- sum(subset(df3, player_name == "Ryan Anderson")$'3PA')
+my_chk
+```
+### The check complete the code is working fine. 3PA total is 40.
 
 ######joining data
 ```{r}
@@ -103,6 +142,85 @@ tail(df)
 ```{r}
 str(player_stat)
 ```
+###replace 3 with letter three
+
+```{r}
+names(nba_team_data) <- str_replace_all(string = names(nba_team_data),
+                                             pattern = "3",
+                                             replacement = "three_")
+```
+###replace 2 with letter two
+
+```{r}
+names(nba_team_data) <- str_replace_all(string = names(nba_team_data),
+                                             pattern = "2",
+                                             replacement = "two_")
+```
+###remove special chr in the col names
+```{r}
+names(nba_team_data) <- str_replace_all(string = names(nba_team_data),
+                                      pattern = "%",
+                                      replacement = "_pct")
+```
+###make all varibale names lowercase
+
+```{r}
+names(nba_team_data) <- tolower(names(nba_team_data))
+```
+### same exercise for player stats but first join the player stat and their salary dataframes
+
+```{r}
+player_stat <- left_join(df3, df4, by = c("player_name"))
+```
+###replace 3 with letter three
+
+```{r}
+names(player_stat) <- str_replace_all(string = names(player_stat),
+                                        pattern = "3",
+                                        replacement = "three_")
+```
+###replace 2 with letter two
+
+```{r}
+names(player_stat) <- str_replace_all(string = names(player_stat),
+                                        pattern = "2",
+                                        replacement = "two_")
+```
+###remove special chr in the col names
+
+```{r}
+names(player_stat) <- str_replace_all(string = names(player_stat),
+                                        pattern = "%",
+                                        replacement = "_pct")
+```
+###make all varibale names lowercase
+
+```{r}
+names(player_stat) <- tolower(names(player_stat))
+```
+###Check the Nas
+
+```{r}
+sum(is.na(nba_team_data))
+```
+###no Nas
+
+###head
+
+```{r}
+head(nba_team_data)
+```
+###tail
+
+```{r}
+tail(nba_team_data)
+```
+##check the structure of the dataset using str()
+
+```{r}
+str(nba_team_data)
+```
+
 ## Exploratory data analysis
 
 ```{r}
