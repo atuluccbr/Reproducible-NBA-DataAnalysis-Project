@@ -131,8 +131,57 @@ str(nba_team_data)
 ################################EDA
 ################################
 
+##w variable have strong positive correlation strength with points.
+##more points will likely to win the game
 
+ggplot(data = nba_team_data, aes( x = w, y = pts ))+
+  geom_point()
+##this plot shows that team that score 9125 points or more are likely to win the game.
 
+##l variable have strong negative correlation strength with points.
+##less points will likely to lose the game
+ggplot(data = nba_team_data, aes( x = l, y = pts ))+
+  geom_point()
+
+##three_p variable have strong positive correlation strength with points.
+##more 3 points will likely to win the game.
+ggplot(data = nba_team_data, aes( x = three_p, y = pts ))+
+  geom_point()
+
+##fg variable have strong positive correlation strength with points.
+##more field goals will likely to win the game.
+
+ggplot(data = nba_team_data, aes( x = fg, y = pts ))+
+  geom_point()
+
+##three_p variable have strong positive correlation strength with points.
+##more 2 points will likely to win the game.
+ggplot(data = nba_team_data, aes( x = two_p, y = pts ))+
+  geom_point()
+
+##tov variable have no correlation strength with points.
+ggplot(data = nba_team_data, aes( x = tov, y = pts ))+
+  geom_point()
+
+##ast variable have strong positive correlation strength with points.
+##more assist will likely to win the game.
+ggplot(data = nba_team_data, aes( x = ast, y = pts ))+
+  geom_point()
+
+##trb variable have strong positive correlation strength with points.
+##more total rebounds will likely to win the game.
+ggplot(data = nba_team_data, aes( x = trb, y = pts ))+
+  geom_point()
+
+##blk variable have weak positive correlation strength with points.
+##more blocks will likely to win the game.
+ggplot(data = nba_team_data, aes( x = blk, y = pts ))+
+  geom_point()
+
+##stl variable have no correlation with points.
+
+ggplot(data = nba_team_data, aes( x = stl, y = pts ))+
+  geom_point()
 
 
 ##############################################
@@ -197,30 +246,25 @@ corrplot(cor_matrix, method="color", type="lower", order="hclust", tl.cex=0.7, t
 
 
 ################################################
+ 
+cor(x = nba_team_data$three_p, y = nba_team_data$pts, method = "pearson")
+##0.4565
 
-#cor(x = combined_team_stat$age, y = combined_team_stat$w, method = "pearson")
-## 0.621794
-##linear regression
+cor(x = nba_team_data$fg, y = nba_team_data$pts, method = "pearson")
+##0.8164 - very strong relationship
+# 
+cor(x = nba_team_data$two_p, y = nba_team_data$pts, method = "pearson")
+##0.3105
+# 
+cor(x = nba_team_data$ast, y = nba_team_data$pts, method = "pearson")
+##0.5653
+# 
+cor(x = nba_team_data$trb, y = nba_team_data$pts, method = "pearson")
+##0.5722
+#
+cor(x = nba_team_data$blk, y = nba_team_data$pts, method = "pearson")
+##0.4094
 
-# lm_plot <- ggplot(combined_team_stat, aes(x = drb_percage, y = w)) +
-#   geom_point(colour = "dodgerblue") +
-#   geom_smooth(method = "lm", colour = "magenta")
-# 
-# lm_plot
-# 
-# 
-cor(x = nba_team_data$three_p, y = nba_team_data$w, method = "pearson")
-# ##0.4838773
-# 
-# cor(x = combined_team_stat$`drb_percage`, y = combined_team_stat$w, method = "pearson")
-# ## 0.44833
-# 
-# cor(x = combined_team_stat$`tov_percage`, y = combined_team_stat$w, method = "pearson")
-# ## -0.3068
-# 
-# cor(x = combined_team_stat$stl, y = combined_team_stat$w, method = "pearson")
-# ## 0.10202
-# 
 # cor(x = combined_team_stat$blk, y = combined_team_stat$w, method = "pearson")
 # ## 0.44488
 # 
@@ -228,35 +272,49 @@ cor(x = nba_team_data$three_p, y = nba_team_data$w, method = "pearson")
 # ## 0.50187
 # 
 # ##linear regression
-# lm_plot <- ggplot(combined_team_stat, aes(x = ast, y = l)) +
-#   geom_point(colour = "dodgerblue") 
-#   #geom_smooth(method = "lm", colour = "magenta")
-# 
-# lm_plot
+lm_plot <- ggplot(nba_team_data, aes(x = three_p, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot
+
+lm_plot <- ggplot(nba_team_data, aes(x = fg, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot
+
+lm_plot <- ggplot(nba_team_data, aes(x = two_p, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot
+
+lm_plot <- ggplot(nba_team_data, aes(x = ast, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot
+
+lm_plot <- ggplot(nba_team_data, aes(x = trb, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot
+
+lm_plot <- ggplot(nba_team_data, aes(x = blk, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot
+
 # 
 # ##use pairs to check correlation
 # 
-# pairs(formula = w ~ blk + stl + tov + ast, data = combined_team_stat)
+pairs(formula = pts ~ three_p + fg + two_p + ast + trb + blk, data = nba_team_data)
 # 
-# pairs(formula = w ~ fg + three_p + two_p, data = combined_team_stat)
-# 
-# lm_blk <- lm(pts ~ blk + ast, data = combined_team_stat)
-# tidy(lm_blk, conf.int = TRUE)
 
-# How many more points will a team score if they increase the number 
-# of field goals, but keep three pointers fixed?
-
-##multiple linear regression
-
-fit <- lm(w ~ pts + blk + three_p + fg + ast + tov, data = nba_team_data)
-tidy(fit, conf.int = TRUE)
-
-summary(fit)
-## predicted value
-
-head(predict(fit))
-
-
+###There are some assumptions that we need to be careful of:
 # The response variable should be continuous (i.e. ratio/interval)
 # There are two or more explanatory variables that are either continuous or categorical
 # There should be independence of observations
@@ -265,6 +323,17 @@ head(predict(fit))
 # The data needs to show homoscedasticity
 # The residuals should be normally distributed
 # There should not be multicollinearity between the explanatory variables
+
+
+##multiple linear regression
+
+fit <- lm(pts ~ three_p + fg + two_p + ast + trb + blk, data = nba_team_data)
+tidy(fit, conf.int = TRUE)
+
+summary(fit)
+## predicted value
+
+head(predict(fit))
 
 car::avPlots(fit)
 
@@ -275,8 +344,6 @@ car::avPlots(fit)
 # It can lead to changes in the coefficient estimates and confusion around which 
 # variable is explaining the variance in the response variable
 
-pairs(formula = ~ pts + blk + three_p + fg + ast + tov, data = nba_team_stat)
-
 ## variance inflation factor
 car::vif(fit)
 
@@ -285,11 +352,9 @@ sqrt(car::vif(fit))
 ## the stand error of the coeff for blk is 1.25 times larger than if this variable
 ## had 0 correlation with other predictors
 
-
-
 ##outliers
 
-###Detecting outliers
+###Detecting outliers using rstandard() function
 
 std_res <- rstandard(fit)
 points <- 1:length(std_res)
@@ -301,15 +366,19 @@ ggplot(nba_team_data, aes(x = points, y = std_res)) +
   ylim(c(-4, 4)) +
   geom_hline(yintercept = c(-3, 3), colour = "red", linetype = "dashed")
 
-res_labels <- if_else(abs(std_res) >= 2.5, paste(points), "")
-##replot it
+res_labels <- if_else(abs(std_res) >= 1, paste(points), "")
+
+##visualising the point of interest
+
 ggplot(data = NULL, aes(x = points, y = std_res)) +
   geom_point() +
   geom_text(aes(label = res_labels), nudge_y = 0.3) +
   ylim(c(-4, 4)) +
-  geom_hline(yintercept = c(-3, 3), colour = "red", linetype = "dashed")
+  geom_hline(yintercept = c(-2, 2), colour = "red", linetype = "dashed")
 
-###leverage points
+###leverage points can be checked using hatvalues() function
+##hat values are between 0 and 1 with larger values indicating 
+##greater potential for leverage
 
 hats <- hatvalues(fit)
 
@@ -322,21 +391,19 @@ ggplot(data = NULL, aes(x = points, y = hats)) +
   geom_point() +
   geom_text(aes(label = hat_labels), nudge_y = 0.0005)
 
-###Influence
-
-###cooks distance
+###cooks distance is calucalted to check the change in the coefficient
+##when the ithpoint is deleted
 
 cook <- cooks.distance(fit)
 
 ggplot(data = NULL, aes(x = points, y = cook)) +
   geom_point()
 
-cook_label <- if_else(cook >= 0.015, paste(points), "")
+cook_label <- if_else(cook >= 0.1, paste(points), "")
 
 ggplot(data = NULL, aes(x = points, y = cook)) +
   geom_point() +
-  geom_text(aes(label  = cook_label), nudge_y = 0.001)
-
+  geom_text(aes(label  = cook_label), nudge_y = 0.01)
 
 ##independence of observations
 
@@ -344,7 +411,27 @@ library(car)
 
 durbinWatsonTest(fit)
 
+##the durbin watson test value is 2.40 which indicates non-autocorrenlation
+# lag Autocorrelation D-W Statistic p-value
+# 1      -0.2123832      2.401582   0.246
+# Alternative hypothesis: rho != 0
 
+##Homoscedasticity indicates the constant variance among residuals on all values
+##of x variable
+
+res <- residuals(fit)
+fitted <- predict(fit)
+
+###visualise it
+
+ggplot(data = NULL, aes(x = fitted, y = res)) +
+  geom_point(colour = "dodgerblue") + 
+  geom_hline(yintercept = 0, colour = "red", linetype = "dashed")
+
+###check the normality of residuals
+
+ggplot(data = NULL, aes(sample = res)) +
+  stat_qq() + stat_qq_line()
 
 #####################################################
 ########################################################
@@ -356,17 +443,128 @@ durbinWatsonTest(fit)
 ## remove the categorical variable player name and use player id instead
 
 new_data <- nba_team_data %>% 
-  select(pts, blk, three_p, fg, ast, tov)
+  select(team, w, pts, three_p, fg, two_p, ast, trb, blk)
 
 #new_data$player_name <- NULL
 
 new_data <- mutate(new_data, exp_pts = predict(fit, newdata = new_data))
 
-new_data
+##visualise it
+
+ggplot(new_data, aes(exp_pts, pts, label = team)) + 
+  geom_point(colour = "dodgerblue") +
+  geom_text(nudge_x = 0.1, cex = 3) +
+  geom_abline(linetype = "dashed", colour = "magenta") 
+
+##expected points
+ggplot(new_data, aes(x = w, y = exp_pts, label = team)) +
+  geom_point(colour = "dodgerblue") +
+  geom_text(nudge_x = 2, cex = 3)
+
+#############################code works fine till here
+
+###########################
+
+##########################
+###replace 3 with letter three
+names(player_stat) <- str_replace_all(string = names(player_stat),
+                                      pattern = "3",
+                                      replacement = "three_")
+
+###replace 2 with letter two
+names(player_stat) <- str_replace_all(string = names(player_stat),
+                                      pattern = "2",
+                                      replacement = "two_")
+
+
+##remove special chr in the col names
+
+names(player_stat) <- str_replace_all(string = names(player_stat),
+                                      pattern = "%",
+                                      replacement = "_pct")
+
+##make all varibale names lowercase
+names(player_stat) <- tolower(names(player_stat))
+
+players <- select(player_stat, - player_name)
+players$player_name <- NULL  
+  
+players <- mutate(players, exp_Pts = predict(fit, newdata = players))
+
+players %>%
+  ggplot(aes(x = exp_Pts)) +
+  geom_histogram(binwidth = 150, colour = "black", fill = "dodgerblue")
+
+
+players %>% 
+  select(player_id, pos, salary, exp_Pts) %>% 
+  arrange(desc(exp_Pts), salary) %>%
+  top_n(10)
+
+##
+players %>% ggplot(aes(x = salary/1000000, y = exp_Pts, color = pos)) + 
+  geom_point() +
+  xlab("Salary (Millions)")
+
+##join the df4 table to get the name of the player based on the player_id
+
+best_five <- left_join(players, df4, by = c("player_id"))
+
+final_dataset <- best_five %>% 
+  select(player_name, pos, salary.x, exp_Pts)
+
+recommendations <- final_dataset %>% 
+  arrange(desc(exp_Pts), salary.x) %>% 
+  top_n(25)
+
+
+######################
+####################
+
+budget <- 100000000
+total_cost <- 0
+selected_players <- data.frame()
+
+for (i in 1:nrow(recommendations)) {
+  if (total_cost + recommendations[i, "salary.x"] <= budget) {
+    total_cost <- total_cost + recommendations[i, "salary.x"]
+    selected_players <- rbind(selected_players, recommendations[i, ])
+  }
+  if (nrow(selected_players) == 5) {
+    break
+  }
+}
+
+
+###
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##Selecting players by exp_Runs
 new_ply_df <- player_stat %>% 
-  select(player_id, pos, salary, pts, blk, three_p, fg, ast, tov)
+  select(player_id, pos, salary, pts, blk, three_p, two_p, fg, ast, trb)
 
 ##code breaking i need to delete character type column
 
@@ -376,22 +574,16 @@ new_ply_df$player_name <- NULL
 
 new_ply_df <- mutate(new_ply_df, exp_pts_player = predict(fit, newdata = new_ply_df))
 
-
-##new_ply_df <- left_join(new_ply_df, df4, by = c("player_name"))
-
-
 new_ply_df %>%
+  group_by(pos) %>% 
   select(player_id, pos, salary, exp_pts_player) %>% 
-  arrange(desc(exp_pts_player, salary)) %>% 
+  arrange(desc(exp_pts_player)) %>% 
   top_n(10)
 
 ############################code worked till here
 #############################################################
 
-players %>% 
-  select(player_name, player_id, pos, salary, exp_Runs) %>% 
-  arrange(desc(exp_Runs), salary) %>%
-  top_n(10)
+
 
 #####working
 
@@ -405,3 +597,38 @@ plot(nba_team_stat$w, nba_team_stat$pts, xlab="Wins", ylab="Points", main="NBA T
 cor(nba_team_stat$w, nba_team_stat$pts)
 
 ## more points more wins 66% chances of winning if you score 
+
+
+# load the player statistics and salaries datasets
+player_stats <- read.csv("2018-19_nba_player-statistics.csv", header=TRUE)
+player_salaries <- read.csv("2018-19_nba_player-salaries.csv", header=TRUE)
+
+# merge the datasets by player name
+player_data <- merge(player_stats, player_salaries, by="Player")
+
+# select only the relevant columns
+player_data <- player_data[,c("Player", "Pos", "PTS", "AST", "TRB", "STL", "BLK", "Salary")]
+
+# calculate the total fantasy points for each player
+player_data$Fantasy_Points <- player_data$PTS + (1.5 * player_data$AST) + (1.25 * player_data$TRB) + (2 * player_data$STL) + (2 * player_data$BLK)
+
+# sort the players by fantasy points
+player_data <- player_data[order(-player_data$Fantasy_Points),]
+
+# select the top 5 players within a budget of 100 million
+budget <- 100000000
+total_cost <- 0
+selected_players <- data.frame()
+
+for (i in 1:nrow(player_data)) {
+  if (total_cost + player_data[i, "Salary"] <= budget) {
+    total_cost <- total_cost + player_data[i, "Salary"]
+    selected_players <- rbind(selected_players, player_data[i, ])
+  }
+  if (nrow(selected_players) == 5) {
+    break
+  }
+}
+
+# display the selected players and their fantasy points
+print(selected_players[,c("Player", "Pos", "Fantasy_Points")])

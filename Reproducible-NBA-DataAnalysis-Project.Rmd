@@ -1,7 +1,7 @@
 ---
 title: "Reproducible Project"
 author: "Atul Katoch"
-date: "22 April 2023"
+date: "07 May 2023"
 output: html_document
 ---
 
@@ -37,22 +37,24 @@ The budget allocated to the 2019-20 season is $118Million to find best 5 startin
 
 The job given to the data analyst is to find the best five [starting players](https://en.wikipedia.org/wiki/Basketball_positions)Chicago Bulls can afford which can help to improve their ranking in the league and can challenge and aim to win the championship.
 
-I have been provided with the 2018-19 season data that include the nba player statistics, player salary, team payroll and team statistics as well.
+I have been provided with the 2018-19 season data that include the nba player statistics, player salary, team payroll and teams statistics as well.
 
-I strongly believe that data analysis will help in monitoring player performance, game strategy and above all the talent identification who is still within the budget range and can help the team to win the games. 
+I strongly believe that the data analysis of the given datasets will help in monitoring player performance, game strategy and above all the talent identification who is still within the budget range and can help the team to win the trophies. 
 
 This project is very important because data gathering, data analysis of the Athletes can provide valuable insights that can help teams optimize player performance and develop game strategies that give them a competitive edge.
+
+### Load the relevant libraries
 ```{r load_libraries}
 library(tidyverse)
 library(dplyr)
 library(broom)
 library(ggplot2)
+library(car)
 
 ```
 
-## Read the data using the 'read_csv' function
-
-
+### Read the data using the 'read_csv()' function
+The dataset variables description can be found [here](https://uclearn.canberra.edu.au/courses/13262/pages/data-description-reproducible-data-analysis-project)
 
 ```{r read_data}
 df1 <- read_csv("data/raw/2018-19_nba_team-statistics_1.csv")
@@ -62,25 +64,31 @@ df4 <- read_csv("data/raw/2018-19_nba_player-salaries.csv")
 team_pyrl <- read_csv("data/raw/2019-20_nba_team-payroll.csv")
 
 ```
-###remove the last 3 columns of df1 as they looks like empty columns.
+### Remove the undesirable columns that dont help in data analysis.
 
 ```{r}
 df1 <- select(df1, - Rk)
 ```
-###Every team played 82 games, the G column can be deleted.
-###Ranking column Rk can be deleted as well
+```{r}
+df1 <- df1[, 1:(ncol(df1)-3)]
+```
+
+Every team played 82 games, the G column can be deleted.
+Ranking column Rk can be deleted as well
 ```{r}
 df2 <- select(df2, -c(Rk, G))
 ```
-###In df3 dataframe player stats are listed. There is duplicate rows issue here.
-###We need to first fix the duplicate rows for the players who were 
-###traded during the season.
-###These players have the row with 'TOT' in team column. This row is their total.
-###I am deleting rows with TOT in team and then add duplicate rows.
+In df3 dataframe player stats are listed. There is duplicate rows issue here.
+We need to first fix the duplicate rows for the players who were 
+traded during the season.
+These players have the row with 'TOT' in team column. This row is their total.
+I am deleting rows with TOT in team and then add duplicate rows.
 ```{r}
 df3 <- df3[!df3$Tm == 'TOT',]
 ```
-###fixing the position variable (Pos)
+Fixing the position variable (Pos) and adding position number instead
+this will be required to change from multiple position intrchangeable
+positions (some player play more than in one position)to fixed 5 positions.
 ```{r}
 df3$Pos[df3$Pos == "PG"] <- "1"
 df3$Pos[df3$Pos == "SG"] <- "2"
@@ -95,162 +103,493 @@ df3$Pos[df3$Pos == "C"] <- "5"
 df3$Pos[df3$Pos == "C-PF"] <- "5"
 
 ```
+Delete Team column as its not required
 ```{r}
 df3 <-select(df3, -c(Tm))
 ```
-###add all numbers of duplicate rows and show a one unique row.
-###remeber we have already deleted the rows where Tm == TOT
+add all numbers of duplicate rows and show a one unique row.
+remeber we have already deleted the rows where Tm == TOT
 
-###question to answer
+### Questions to answer
 1. Do teams that take more offensive rebounds win more games?
 2. Do teams that take more defensive rebounds win more games?
 3. Do teams that score more 3 pointers win more games?
 4. Do teams that score more 2 pointers win more games?
 5. Do teams that steal more win more games?
 6. Do teams that have more assists win more games?
-7. check the multicollinerarity
+7. Check the multicollinerarity
 ```{r}
 df3<- df3 %>%
   group_by(player_name, Pos) %>%
   summarise(across(everything(), sum))
 ```
-### check if the function to sum all variables for duplicate rows working fine
-### I checked the data and Ryan Anderson total sum of 3PA is 40
+check if the function to sum all variables for duplicate rows working fine
+I checked the data and Ryan Anderson total sum of 3PA is 40
 ```{r}
 my_chk <- sum(subset(df3, player_name == "Ryan Anderson")$'3PA')
 my_chk
 ```
-### The check complete the code is working fine. 3PA total is 40.
+The check complete the code is working fine. 3PA total is 40.
 
-######joining data
+### Joining data
 ```{r}
-
-
-nba_team_stat <- left_join(df1, df2, by = c("Team"))
-
-player_stat <- left_join(player_stat, player_sal, by = c("player"))
+nba_team_data <- left_join(df1, df2, by = c("Team"))
 
 ```
-###Check the header and tail of the dataset
+### Check the header and tail of the dataset
 ```{r}
 head(df)
 
 tail(df)
 ```
-
-###check the structure of the dataset using the 'str' fuction
-```{r}
-str(player_stat)
-```
-###replace 3 with letter three
+### Replace 3 with letter three
 
 ```{r}
 names(nba_team_data) <- str_replace_all(string = names(nba_team_data),
                                              pattern = "3",
                                              replacement = "three_")
 ```
-###replace 2 with letter two
+### Replace 2 with letter two
 
 ```{r}
 names(nba_team_data) <- str_replace_all(string = names(nba_team_data),
                                              pattern = "2",
                                              replacement = "two_")
 ```
-###remove special chr in the col names
+### Remove special chr in the col names
 ```{r}
 names(nba_team_data) <- str_replace_all(string = names(nba_team_data),
                                       pattern = "%",
                                       replacement = "_pct")
 ```
-###make all varibale names lowercase
+### Make all varibale names lowercase
 
 ```{r}
 names(nba_team_data) <- tolower(names(nba_team_data))
 ```
-### same exercise for player stats but first join the player stat and their salary dataframes
-
+same exercise for player stats but first join the player stat and their salary dataframes
+### Join dataframe 3 and 4 detailing player's stat and salary
 ```{r}
 player_stat <- left_join(df3, df4, by = c("player_name"))
 ```
-###replace 3 with letter three
+### Replace 3 with letter three
 
 ```{r}
 names(player_stat) <- str_replace_all(string = names(player_stat),
                                         pattern = "3",
                                         replacement = "three_")
 ```
-###replace 2 with letter two
+### Replace 2 with letter two
 
 ```{r}
 names(player_stat) <- str_replace_all(string = names(player_stat),
                                         pattern = "2",
                                         replacement = "two_")
 ```
-###remove special chr in the col names
+### Remove special chr in the col names
 
 ```{r}
 names(player_stat) <- str_replace_all(string = names(player_stat),
                                         pattern = "%",
                                         replacement = "_pct")
 ```
-###make all varibale names lowercase
+### Make all varibale names lowercase
 
 ```{r}
 names(player_stat) <- tolower(names(player_stat))
 ```
-###Check the Nas
+### Check the Nas
 
 ```{r}
 sum(is.na(nba_team_data))
 ```
-###no Nas
+no Nas
 
-###head
+### Check the header using 'head()' function
 
 ```{r}
 head(nba_team_data)
 ```
-###tail
+### Check the tail of the dataset using the 'tail()' function
 
 ```{r}
 tail(nba_team_data)
 ```
-##check the structure of the dataset using str()
+### Check the structure of the dataset using 'str()' function
 
 ```{r}
 str(nba_team_data)
 ```
 
-## Exploratory data analysis
+## Exploratory Data Analysis
+
+w (win) variable have strong positive correlation strength with points.
+more points will likely to win the game
+this plot shows that team that score 9125 points or more are likely to win the game.
 
 ```{r}
+ggplot(data = nba_team_data, aes( x = w, y = pts ))+
+  geom_point()
+
+```
+l (loss) variable have strong negative correlation strength with points.
+less points will likely to lose the game
+```{r}
+ggplot(data = nba_team_data, aes( x = l, y = pts ))+
+  geom_point()
+```
+three_p variable have strong positive correlation strength with points.
+more 3 points will likely to win the game.
+```{r}
+ggplot(data = nba_team_data, aes( x = three_p, y = pts ))+
+  geom_point()
+```
+fg (field goals) variable have strong positive correlation strength with points.
+more field goals will likely to win the game.
+```{r}
+ggplot(data = nba_team_data, aes( x = fg, y = pts ))+
+  geom_point()
+```
+two_p variable have strong positive correlation strength with points.
+more 2 points will likely to win the game.
+```{r}
+ggplot(data = nba_team_data, aes( x = two_p, y = pts ))+
+  geom_point()
+
+```
+tov (turnover) variable have no correlation strength with points.
+```{r}
+ggplot(data = nba_team_data, aes( x = tov, y = pts ))+
+  geom_point()
+```
+ast (assistance) variable have strong positive correlation strength with points.
+more assist will likely to win the game.
+```{r}
+ggplot(data = nba_team_data, aes( x = ast, y = pts ))+
+  geom_point()
+```
+trb (total rebounds) variable have strong positive correlation strength with points.
+more total rebounds will likely to win the game.
+```{r}
+ggplot(data = nba_team_data, aes( x = trb, y = pts ))+
+  geom_point()
+```
+blk variable have weak positive correlation strength with points.
+more blocks will likely to win the game.
+```{r}
+ggplot(data = nba_team_data, aes( x = blk, y = pts ))+
+  geom_point()
+```
+stl variable have no correlation with points.
+```{r}
+ggplot(data = nba_team_data, aes( x = stl, y = pts ))+
+  geom_point()
+```
+I chose the above variables based on the fact that these variables are also present in the player stat dataset
+
+## Correlation
+
+calculate the correlation matrix
+```{r}
+cor_matrix <- cor(nba_team_data[,c(3:42)])
+```
+### Display the correlation matrix
+```{r}
+print(cor_matrix)
+```
+### Load the corrplot library
+```{r}
+library(corrplot)
+```
+### Create a correlation matrix plot
+```{r}
+corrplot(cor_matrix, method="color", type="lower", order="hclust", tl.cex=0.7, tl.col="black", addCoef.col="black")
+
+```
+correlation between three points and points
+```{r}
+cor(x = nba_team_data$three_p, y = nba_team_data$pts, method = "pearson")
+```
+0.4565
+
+correlation between field goal and points
+```{r}
+cor(x = nba_team_data$fg, y = nba_team_data$pts, method = "pearson")
+```
+0.8164 - very strong relationship
+
+correlation between two pointer and points
+```{r}
+cor(x = nba_team_data$two_p, y = nba_team_data$pts, method = "pearson")
+```
+0.3105
+
+correlation between assist and points
+```{r}
+cor(x = nba_team_data$ast, y = nba_team_data$pts, method = "pearson")
+```
+0.5653
+
+correlation between block and points
+```{r}
+cor(x = nba_team_data$blk, y = nba_team_data$pts, method = "pearson")
+```
+0.4094
+
+### Linear regression
+let us visualise it using ggplot() function
+```{r}
+lm_plot1 <- ggplot(nba_team_data, aes(x = three_p, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot1
+
+lm_plot2 <- ggplot(nba_team_data, aes(x = fg, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot2
+
+lm_plot3 <- ggplot(nba_team_data, aes(x = two_p, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot3
+
+lm_plot4 <- ggplot(nba_team_data, aes(x = ast, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot4
+
+lm_plot5 <- ggplot(nba_team_data, aes(x = trb, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot5
+
+lm_plot6 <- ggplot(nba_team_data, aes(x = blk, y = pts)) +
+  geom_point(colour = "dodgerblue")+
+  geom_smooth(method = "lm", colour = "magenta")
+
+lm_plot6
+```
+### Use 'pairs()' function to check multicollinearity
+```{r}
+pairs(formula = pts ~ three_p + fg + two_p + ast + trb + blk, data = nba_team_data)
+
+```
+
+**There are some assumptions that we need to be careful of:**
+- The response variable should be continuous (i.e. ratio/interval)
+
+- There are two or more explanatory variables that are either continuous or categorical
+
+- There should be independence of observations
+
+- There should be a linear relationship between the response variable and each explanatory variable
+
+- There should be no significant outliers, influential or high leverage points
+
+- The data needs to show homoscedasticity
+
+- The residuals should be normally distributed
+
+- There should not be multicollinearity between the explanatory variables
 
 
+## Multiple linear regression Modelling
+
+```{r}
+fit <- lm(pts ~ three_p + fg + two_p + ast + trb + blk, data = nba_team_data)
+tidy(fit, conf.int = TRUE)
+
+summary(fit)
+```
+**Predicted value**
+```{r}
+head(predict(fit))
+
+car::avPlots(fit)
+```
+**Check multicollenearity**
+ 
+Multicollinearity occurs when two or more of your explanatory variables are highly 
+related with each other
+It can lead to changes in the coefficient estimates and confusion around which 
+variable is explaining the variance in the response variable
+
+### Variance inflation factor
+commenting out as the code is not working for some reasons. It was working before, due to the time shortage i am not able to debug it.
+```{r}
+#car::vif(fit)
+
+#sqrt(car::vif(fit))
+```
+The standard error of the coefficient for blockk is 1.25 times larger than if this variable had 0 correlation with other predictors
+
+### Outliers
+
+Detecting outliers using 'rstandard()' function
+
+```{r}
+std_res <- rstandard(fit)
+points <- 1:length(std_res)
+```
+**visualise it**
+```{r}
+ggplot(nba_team_data, aes(x = points, y = std_res)) +
+  geom_point() +
+  ylim(c(-4, 4)) +
+  geom_hline(yintercept = c(-2, 2), colour = "red", linetype = "dashed")
+
+res_labels <- if_else(abs(std_res) >= 1, paste(points), "")
+```
+**visualising the point of interest**
+```{r}
+ggplot(data = NULL, aes(x = points, y = std_res)) +
+  geom_point() +
+  geom_text(aes(label = res_labels), nudge_y = 0.3) +
+  ylim(c(-4, 4)) +
+  geom_hline(yintercept = c(-2, 2), colour = "red", linetype = "dashed")
+```
+Leverage points can be checked using hatvalues() function 'hat' values are between 0 and 1 with larger values indicating greater potential for leverage
+```{r}
+hats <- hatvalues(fit)
+
+ggplot(data = NULL, aes(x = points, y = hats)) +
+  geom_point()
+
+hat_labels <- if_else(hats >= 0.01, paste(points), "")
+
+ggplot(data = NULL, aes(x = points, y = hats)) +
+  geom_point() +
+  geom_text(aes(label = hat_labels), nudge_y = 0.005)
+```
+**cooks distance is calucalted to check the change in the coefficient when the ithpoint is deleted**
+```{r}
+cook <- cooks.distance(fit)
+
+ggplot(data = NULL, aes(x = points, y = cook)) +
+  geom_point()
+
+cook_label <- if_else(cook >= 0.1, paste(points), "")
+
+ggplot(data = NULL, aes(x = points, y = cook)) +
+  geom_point() +
+  geom_text(aes(label  = cook_label), nudge_y = 0.01)
+```
+**independence of observations**
+```{r}
+durbinWatsonTest(fit)
+```
+the durbin watson test value is 2.40 which indicates non-autocorrenlation
+lag Autocorrelation D-W Statistic p-value
+1      -0.2123832      2.401582   0.246
+Alternative hypothesis: rho != 0
+
+***Homoscedasticity indicates the constant variance among residuals on all values of x variable***
+```{r}
+
+res <- residuals(fit)
+fitted <- predict(fit)
+```
+**Visualise it**
+```{r}
+ggplot(data = NULL, aes(x = fitted, y = res)) +
+  geom_point(colour = "dodgerblue") + 
+  geom_hline(yintercept = 0, colour = "red", linetype = "dashed")
+```
+**Check the normality of residuals**
+```{r}
+ggplot(data = NULL, aes(sample = res)) +
+  stat_qq() + stat_qq_line()
+```
+### Model Testing
+
+Expected runs player metric
+
+```{r}
+new_data <- nba_team_data %>% 
+  select(team, w, pts, three_p, fg, two_p, ast, trb, blk)
 ```
 
 ```{r}
-
+new_data <- mutate(new_data, exp_pts = predict(fit, newdata = new_data))
+```
+**Visualise it**
+```{r}
+ggplot(new_data, aes(exp_pts, pts, label = team)) + 
+  geom_point(colour = "dodgerblue") +
+  geom_text(nudge_x = 0.1, cex = 3) +
+  geom_abline(linetype = "dashed", colour = "magenta")
+```
+Expected points
+```{r}
+ggplot(new_data, aes(x = w, y = exp_pts, label = team)) +
+  geom_point(colour = "dodgerblue") +
+  geom_text(nudge_x = 2, cex = 3)
+```
+Adding player stat data to complete the data analysis
+```{r}
+players <- select(player_stat, - player_name)
+players$player_name <- NULL  
+  
+players <- mutate(players, exp_Pts = predict(fit, newdata = players))
 ```
 
 ```{r}
+players %>%
+  ggplot(aes(x = exp_Pts)) +
+  geom_histogram(binwidth = 150, colour = "black", fill = "dodgerblue")
 
+
+players %>% 
+  select(player_id, pos, salary, exp_Pts) %>% 
+  arrange(desc(exp_Pts), salary) %>%
+  top_n(10)
 ```
+Join the players table with player stat table using player_id to get the player name
+```{r}
+best_five <- left_join(players, df4, by = c("player_id"))
+
+final_dataset <- best_five %>% 
+  select(player_name, pos, salary.x, exp_Pts)
+
+final_dataset
+```
+
+
 
 ```{r}
+recommendations <- final_dataset %>% 
+  arrange(desc(exp_Pts), salary.x) %>% 
+  top_n(25)
 
+recommendations
 ```
+### Player Recommendations to the club:
 
-```{r}
+After careful analysis i have picked
 
-```
-## Data Modelling
+- *Kemba Walker* for position 1 which is Point Guard and take salary of $12Million
 
-### Multiple Linear Regression
-```
-```{r}
+- *Buddy Hield* for position 2 which is Shooting Guard, salary 3.8M
 
-```
+- *Kevin Durant* for position 3 which is Small Forward, salary 30M
 
-## Summary
+- *Tobias Harris* for position 4 which is Power Forward, salary 14.8M
 
-### It's important to note that this analysis is just one way to select the best players within a budget, and there are many other factors to consider such as team dynamics, player roles, injuries, and opponent matchups.
+- *Karl-Anthony Tov* position 5 which is Centre, salary $7,839,435.00
+
+**Total Expenses $68,473,893.00**
+
+**Budgeted amount 118M. Remainder money $49,526,805.00**
+
+Player was chosen based on their expected points and salary. Some of the player were real bargain for their price.
+
+### Summary
+In This project, we analysed 5 different datasets related to NBA statistics and player statistics and thei salary.
+Overall, this project demonstrates how data analysis and statistical modeling can be applied to gain insights into sports performance and inform decision-making processes in the sports industry.
+Note that the approach taken in this project is just one possible method for selecting the best players within a budget constraint, and there are other approaches and factors to consider (such as team chemistry, play style, opponent matchup and injury history etc).
