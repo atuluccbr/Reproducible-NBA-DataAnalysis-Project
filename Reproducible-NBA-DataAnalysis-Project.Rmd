@@ -587,9 +587,11 @@ After careful analysis i have picked
 
 **Budgeted amount 118M. Remainder money $49,526,805.00**
 
+The whole final dataset was based on the specific traits of the players like 3point shooting ability, 2 points, field goals, assits ability, total rebounds and blocks for defence.
+
 Player was chosen based on their expected points and salary. Some of the player were real bargain for their price.
 
 ### Summary
-In This project, we analysed 5 different datasets related to NBA statistics and player statistics and thei salary.
+In This project, we analysed 5 different datasets related to NBA statistics and player statistics and their salary.
 Overall, this project demonstrates how data analysis and statistical modeling can be applied to gain insights into sports performance and inform decision-making processes in the sports industry.
-Note that the approach taken in this project is just one possible method for selecting the best players within a budget constraint, and there are other approaches and factors to consider (such as team chemistry, play style, opponent matchup and injury history etc).
+Note that the approach taken in this project is just one possible method (using the best traits required for various position the player are bought for) for selecting the best players within a budget constraint, and there are other approaches and factors to consider (such as team chemistry, play style, opponent matchup and injury history etc).
